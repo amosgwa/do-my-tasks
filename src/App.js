@@ -1,50 +1,48 @@
-import React, { Component } from "react"
-import logo from "./logo.svg"
-import "./App.css"
-
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
-  }
-
-  handleClick = api => e => {
-    e.preventDefault()
-
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
-  }
-
-  render() {
-    const { loading, msg } = this.state
-
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
-  }
-}
+import './App.css';
+import ItemRow from "./components/ItemRow";
+import {Component} from "react";
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
-      </div>
-    )
-  }
+
+    constructor(props) {
+        super(props);
+        this.CURRENT_CACHE_KEY = "CURRENT_CACHE_KEY"
+        var dummyitem = {
+            "name": "Test 1",
+            "count": 1
+        }
+        this.state = {
+            items: []
+        }
+    }
+
+    componentDidMount() {
+        fetch('https://afd2-2601-280-c280-7010-c4df-56e2-d57d-130a.ngrok.io', {method: 'GET'})
+            .then((resp) => resp.json())
+            .then((data) => {
+                this.setState({
+                    items: (data && data.items) || []
+                })
+            })
+            .catch((err) => console.error(err));
+    }
+
+    render() {
+        return (
+            <div className="App">
+                <header className="App-header">
+                </header>
+                <main>
+                    <p><strong>Current Inventories</strong></p>
+                    {this.state.items.map((value, idx) => {
+                        return (
+                            <ItemRow name={value.name} count={value.count}/>
+                        )
+                    })}
+                </main>
+            </div>
+        );
+    }
 }
 
-export default App
+export default App;
